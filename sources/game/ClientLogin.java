@@ -34,15 +34,15 @@ public class ClientLogin extends JFrame implements ActionListener, KeyListener{
 
         Container c = getContentPane();
         c.setLayout(new GridLayout(3, 2));
-        c.add(new JLabel("User: "));
+        c.add(new JLabel("USER: "));
         c.add(user);
-        c.add(new JLabel("Password: "));
+        c.add(new JLabel("PASSWORD: "));
         c.add(password);
         c.add(login);
         c.add(cancel);
         setLocation(400, 300);
         setSize(300, 150);
-        ImageIcon img = new ImageIcon("img/server_earth.png");
+        ImageIcon img = new ImageIcon("Resources/img/server_earth.png");
         setIconImage(img.getImage());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);

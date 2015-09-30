@@ -2,20 +2,18 @@ package game;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.LinkedList;
-import java.util.Vector;
 
 /**Thread for each user whom connects to server*/
-public class ClientThreadForServer extends Thread {
+public class ServerClientThread extends Thread {
 	private String clientName = null;
 	private BufferedReader input = null;
 	private PrintStream output = null;
 	private Socket clientSocket = null;
-	private final ClientThreadForServer[] m_threads;
+	private final ServerClientThread[] m_threads;
 	private int maxClientsCount;
 	private Server parentServer;
 
-	public ClientThreadForServer(Socket clientSocket, Server sv, ClientThreadForServer[] threads) {
+	public ServerClientThread(Socket clientSocket, Server sv, ServerClientThread[] threads) {
 		this.clientSocket = clientSocket;
 		this.m_threads = threads;
 		maxClientsCount = threads.length;
@@ -26,7 +24,7 @@ public class ClientThreadForServer extends Thread {
 	public void run() {
 
 		int maxClientsCount = this.maxClientsCount;
-		ClientThreadForServer[] threads = this.m_threads;
+		ServerClientThread[] threads = this.m_threads;
 
 		try {
 
@@ -77,7 +75,7 @@ public class ClientThreadForServer extends Thread {
                      * Echo this message to let the client know the private
                      * message was sent.
                      */
-										this.output.println(">" + username + "< " + words[1]);
+										//this.output.println(">" + username + "< " + words[1]);
 										break;
 									}
 								}

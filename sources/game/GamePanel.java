@@ -5,21 +5,22 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.io.OutputStream;
+
 
 /**
  * Created by Anton on 28/09/2015.
  */
-public class ClientGamePanel extends JPanel{
+public class GamePanel extends JPanel{
 
     protected static JButton table[];
     protected static String symbol;
     protected static String[] tabuleiro;
-    private String server;
-    private Socket gamesocket;
+    public static String server;
+    public static OutputStream out;
 
-    public ClientGamePanel(String sv)
+
+    public GamePanel(String sv)
     {
         server = sv;
         tabuleiro = new String[9];
@@ -30,8 +31,8 @@ public class ClientGamePanel extends JPanel{
         table = new JButton[9]; //Os table do jogo
         for(int i = 0; i < 9; i++)
         {
-            table[i] = new JButton(""); //Aloca cada um zerado
-            table[i].setEnabled(true);
+            table[i] = new JButton(""); //Cria cada botão desativado
+            table[i].setEnabled(false);
         }
 
         for(int i = 0; i < 9; i++)
@@ -41,8 +42,10 @@ public class ClientGamePanel extends JPanel{
             table[i].addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    //Game.Jogada(j);
-                    //unblockGame(false);
+                    table[j].setText("X");
+                    table[j].setEnabled(false);
+                    sendMove(j);
+                    System.out.println("ENVIEI JOGADA NA POSICAO "+String.valueOf(j));
                 }
             });
             table[i].setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
@@ -51,14 +54,37 @@ public class ClientGamePanel extends JPanel{
         setVisible(true);
     }
 
-    public void setGame(String oponent){
-        try{
-            gamesocket = new Socket(server, 2221);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
+    public static void blockGame(boolean state){
+        for(JButton each : table){
+            if(each.getText().equals(""))
+                each.setEnabled(state);
+        }
+
+    }
+
+    public void sendMove(int position) {
+        try {
+            out.write((String.valueOf(position)).getBytes());
+            out.flush();
+            System.out.println("JOGADA ENVIADA");
+            blockGame(true);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void close(){
+        try {
+            out.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void setSymbol(String mysymbol){
+        symbol = mysymbol;
+        if(symbol.equals("X"))
+            blockGame(false);
     }
 
 }

@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,23 +12,10 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Observable;
 import java.util.Observer;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 // Class to manage Client chat Box.
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.util.Observable;
-import java.util.Observer;
-import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -40,7 +26,7 @@ import javax.swing.SwingUtilities;
 
 // Class to manage Client chat Box.
 public class Client {
-    private static String server;
+    public static String server;
 
     /** Chat client access */
     static class ChatAccess extends Observable {
@@ -65,8 +51,14 @@ public class Client {
                         BufferedReader reader = new BufferedReader(
                                 new InputStreamReader(socket.getInputStream()));
                         String line;
-                        while ((line = reader.readLine()) != null)
-                            notifyObservers(line);
+                        while ((line = reader.readLine()) != null) {
+                            if(line.contains("/duel")){
+                                System.out.println("ESTOU SENDO DESAFIADO");
+                                askPlayer();
+                            }else{
+                                notifyObservers(line);
+                            }
+                        }
                     } catch (IOException ex) {
                         notifyObservers(ex);
                     }
@@ -75,11 +67,23 @@ public class Client {
             receivingThread.start();
         }
 
+        private void askPlayer(){
+            Object[] selectionValues = { "Yes", "No" };
+
+            /** box for client or server */
+            Object selection = JOptionPane.showInputDialog(null, "Accept duel? ",
+                    "MyChatApp", JOptionPane.QUESTION_MESSAGE, null,
+                    selectionValues, "Duel");
+            if (selection.equals("Yes")){
+                new ChallengedPlayer().start();
+            }
+        }
         private static final String CRLF = "\r\n"; // newline
 
         /** Send a line of text */
         public void send(String text) {
             try {
+                System.out.println("ENVIANDO -"+text);
                 outputStream.write((text + CRLF).getBytes());
                 outputStream.flush();
             } catch (IOException ex) {
@@ -106,7 +110,7 @@ public class Client {
         private ChatAccess chatAccess;
         private JPanel main, left;
         private JSplitPane splitV;
-        private ClientGamePanel game;
+        private GamePanel game;
 
         public ChatFrame(ChatAccess chatAccess) {
             this.chatAccess = chatAccess;
@@ -140,19 +144,19 @@ public class Client {
 
 
             /** Action for the inputTextField*/
-            ActionListener sendListener = new ActionListener() {
+            final ActionListener sendListener = new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     String str = inputTextField.getText();
                     if (str != null && str.trim().length() > 0){
                         /**Se /help for invocado, imprima a lista de comandos*/
                         if(str.equals("/help")){
-                            textArea.append("/duel NomeDoOponente -> Desafiar alguem\n/quit -> sair do chat\n/about -> ??\n");
-                            /**Se /duel for invocado, retirar o nome do oponente da string*/
-                        }else if(str.startsWith("/duel")) {
-                            String[] tmp;
-                            tmp = str.split(" ");
-
+                            textArea.append("@username /duel-> Desafiar alguem\n/quit -> sair do chat\n/about -> ??\n");
                             /**Do contrario /quit avisa aos outros users e encerra o aplicativo*/
+                        }else if(str.contains("/duel")){
+                            System.out.println("ESTOU DESAFIANDO ALGUEM");
+                            new ChallengerPlayer().start();
+                            chatAccess.send(str);
+                            textArea.append(str);
                         }else{
                             chatAccess.send(str);
                             if(str.equals("/quit"))
@@ -183,10 +187,10 @@ public class Client {
             //-----------------------------------------
 
             splitV = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-            splitV.setDividerLocation(width/4);
+            splitV.setDividerLocation(width/5);
             splitV.setOneTouchExpandable(true);
             splitV.setLeftComponent(left);
-            splitV.setRightComponent(game = new ClientGamePanel(server));
+            splitV.setRightComponent(game = new GamePanel(server));
 
             main.add(splitV, BorderLayout.CENTER);
             main.setLayout(new BoxLayout(main, BoxLayout.X_AXIS));
@@ -220,7 +224,7 @@ public class Client {
         frame.setTitle("MyChat - connected to " + server + ":" + port);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setDefaultLookAndFeelDecorated(false);
-        ImageIcon img = new ImageIcon("img/icon.png");
+        ImageIcon img = new ImageIcon("Resources/img/icon.png");
         frame.setIconImage(img.getImage());
         frame.setSize(700,400);
         frame.setLocationRelativeTo(null);

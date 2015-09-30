@@ -20,7 +20,7 @@ public class Server extends JFrame {
 
 	  // limite de 10 clientes para server
 	  private static final int maxClientsCount = 10;
-	  private static final ClientThreadForServer[] clientThread = new ClientThreadForServer[maxClientsCount];
+	  private static final ServerClientThread[] clientThread = new ServerClientThread[maxClientsCount];
 
       public Server(){
 
@@ -48,6 +48,7 @@ public class Server extends JFrame {
             /** Open a server socket on the portNumber (default 2222)*/
             try {
                   serverSocket = new ServerSocket(portNumber);
+                  System.out.println("SOU O SERVIDOR");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -65,7 +66,7 @@ public class Server extends JFrame {
                                     */
                                     for (clientCounter = 0; clientCounter < maxClientsCount; clientCounter++) {
                                           if (clientThread[clientCounter] == null) {
-                                                (clientThread[clientCounter] = new ClientThreadForServer(clientSocket, sv, clientThread)).start();
+                                                (clientThread[clientCounter] = new ServerClientThread(clientSocket, sv, clientThread)).start();
                                                 break;
                                           }
                                     }
@@ -84,15 +85,6 @@ public class Server extends JFrame {
             }.start();
 
       }
-
-      public Vector<String> getUsers() {
-            return usernames;
-      }
-
-      public String getUser(int index) {
-            return usernames.get(index);
-      }
-
 
       public synchronized void addUser(String username) {
             usernames.add(username);
