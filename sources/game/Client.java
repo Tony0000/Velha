@@ -27,9 +27,10 @@ import javax.swing.SwingUtilities;
 // Class to manage Client chat Box.
 public class Client {
     public static String server;
+    private GamePanel game;
 
     /** Chat client access */
-    static class ChatAccess extends Observable {
+    class ChatAccess extends Observable {
         private Socket socket;
         private OutputStream outputStream;
 
@@ -75,10 +76,10 @@ public class Client {
                     "MyChatApp", JOptionPane.QUESTION_MESSAGE, null,
                     selectionValues, "Duel");
             if (selection.equals("Yes")){
-                new ChallengedPlayer().start();
+                new ChallengedPlayer(game, server).start();
             }
         }
-        private static final String CRLF = "\r\n"; // newline
+        private final String CRLF = "\r\n"; // newline
 
         /** Send a line of text */
         public void send(String text) {
@@ -102,7 +103,7 @@ public class Client {
     }
 
     /** Chat client UI */
-    static class ChatFrame extends JFrame implements Observer {
+    class ChatFrame extends JFrame implements Observer {
 
         private JTextArea textArea;
         private JTextField inputTextField;
@@ -110,7 +111,6 @@ public class Client {
         private ChatAccess chatAccess;
         private JPanel main, left;
         private JSplitPane splitV;
-        private GamePanel game;
 
         public ChatFrame(ChatAccess chatAccess) {
             this.chatAccess = chatAccess;
@@ -154,9 +154,9 @@ public class Client {
                             /**Do contrario /quit avisa aos outros users e encerra o aplicativo*/
                         }else if(str.contains("/duel")){
                             System.out.println("ESTOU DESAFIANDO ALGUEM");
-                            new ChallengerPlayer().start();
+                            new ChallengerPlayer(game).start();
                             chatAccess.send(str);
-                            textArea.append(str);
+                            //textArea.append(str);
                         }else{
                             chatAccess.send(str);
                             if(str.equals("/quit"))
@@ -190,7 +190,7 @@ public class Client {
             splitV.setDividerLocation(width/5);
             splitV.setOneTouchExpandable(true);
             splitV.setLeftComponent(left);
-            splitV.setRightComponent(game = new GamePanel(server));
+            splitV.setRightComponent(game = new GamePanel());
 
             main.add(splitV, BorderLayout.CENTER);
             main.setLayout(new BoxLayout(main, BoxLayout.X_AXIS));
@@ -209,7 +209,7 @@ public class Client {
         }
     }
 
-    public static void createClient(String[] args) {
+    public void createClient(String[] args) {
         server = args[0];
         int port = 2222;
         ChatAccess access = null;

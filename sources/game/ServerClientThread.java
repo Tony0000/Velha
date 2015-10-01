@@ -75,7 +75,6 @@ public class ServerClientThread extends Thread {
                      * Echo this message to let the client know the private
                      * message was sent.
                      */
-										//this.output.println(">" + username + "< " + words[1]);
 										break;
 									}
 								}

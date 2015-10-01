@@ -3,7 +3,6 @@ package game;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -12,9 +11,14 @@ import java.net.Socket;
  */
 public class ChallengerPlayer extends Thread {
     private ServerSocket server;
-    public static Socket conection;
+    public Socket conection;
     private int portNumber = 2221; /**Portnumber for this server and the timeout for closure*/
     private BufferedReader in;
+    private GamePanel game;
+
+    public ChallengerPlayer(GamePanel game){
+        this.game = game;
+    }
 
     public void run(){
 
@@ -24,13 +28,14 @@ public class ChallengerPlayer extends Thread {
             conection = server.accept();
             System.out.println("ALGUEM ESTABELECEU CONEXAO");
             in = new BufferedReader(new InputStreamReader(conection.getInputStream()));
-            GamePanel.out = conection.getOutputStream();
-            GamePanel.setSymbol("X");
+            game.out = conection.getOutputStream();
+            game.setSymbol("X");
+            game.blockGame(false);
             String line;
             while ((line = in.readLine()) != null){
                 System.out.println("RECEBI JOGADA NA POSIÇÃO "+Integer.getInteger(line));
-                GamePanel.table[Integer.getInteger(line)].setText("O");
-                GamePanel.blockGame(false);
+                game.table[Integer.getInteger(line)].setText("O");
+                game.blockGame(false);
             }
         } catch (IOException e) {
             e.printStackTrace();
