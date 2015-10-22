@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.PrintWriter;
 
 
 /**
@@ -16,7 +16,7 @@ public class GamePanel extends JPanel{
     protected JButton table[];
     protected String symbol;
     protected String[] tabuleiro;
-    public OutputStream out;
+    public PrintWriter out;
 
 
     public GamePanel()
@@ -32,6 +32,7 @@ public class GamePanel extends JPanel{
             table[i] = new JButton(""); //Cria cada botão em branco
             table[i].setEnabled(false);
         }
+
 
         for(int i = 0; i < 9; i++)
         {
@@ -63,22 +64,14 @@ public class GamePanel extends JPanel{
         table[position].setText(symbol);
         tabuleiro[position] = symbol;
         table[position].setEnabled(false);
-        try {
-            out.write((String.valueOf(position)).getBytes());
-            out.flush();
-            System.out.println("JOGADA ENVIADA");
-            blockGame(true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        out.write((String.valueOf(position)));
+        out.flush();
+        System.out.println("JOGADA ENVIADA");
+        blockGame(true);
     }
 
     public void close(){
-        try {
-            out.close();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        out.close();
     }
 
     public void setSymbol(String mysymbol){

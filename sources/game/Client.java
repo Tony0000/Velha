@@ -220,6 +220,7 @@ public class Client {
             ex.printStackTrace();
             System.exit(0);
         }
+
         JFrame frame = new ChatFrame(access);
         frame.setTitle("MyChat - connected to " + server + ":" + port);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

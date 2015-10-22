@@ -3,6 +3,7 @@ package game;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -28,7 +29,7 @@ public class ChallengerPlayer extends Thread {
             conection = server.accept();
             System.out.println("ALGUEM ESTABELECEU CONEXAO");
             in = new BufferedReader(new InputStreamReader(conection.getInputStream()));
-            game.out = conection.getOutputStream();
+            game.out = new PrintWriter(conection.getOutputStream());
             game.setSymbol("X");
             game.blockGame(false);
             String line;
